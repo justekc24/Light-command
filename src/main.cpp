@@ -4,12 +4,15 @@
 #include "def.h"
 #include "gsm_manager.h"
 #include "page.h"
+#include "rtc_horloge_manager.h"
+#define LAMP_PIN 5
 
 const char *ssid = "esp8266 wifi";
 const char *password = "isniis";
 
 Time t;
 ESP8266WebServer server;
+TimeConfig config;
 
 void handleRoot()
 {
@@ -21,6 +24,7 @@ void configSetup()
   if (server.hasArg("plain"))
   {
     String json = server.arg("plain");
+    Serial.println(json);
     server.send(200, "application/json", "{\"status\" : \"succes\"}");
   }
   else
@@ -47,6 +51,7 @@ void timeGet()
 
 void setup()
 {
+  pinMode(LAMP_PIN,OUTPUT);
   Serial.begin(115200);
   Serial.println("\n\nStarting setup...");
 
@@ -55,7 +60,8 @@ void setup()
   delay(1000);
 
   // INIT DU GSM
-  t = gsm::getNowTime();
+  Time gsm_time = gsm::getNowTime();
+  setupTime(gsm_time);
 
   Serial.print(t.heure);
   Serial.print("h ");
@@ -80,5 +86,12 @@ void setup()
 
 void loop()
 {
+  if(config.isvalide)
+  {
+    if(t == config.ofTime || t == config.onTime)
+    {
+      digitalWrite(LAMP_PIN,!digitalRead(LAMP_PIN));
+    }
+  }
   server.handleClient();
 }

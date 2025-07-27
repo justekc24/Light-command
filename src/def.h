@@ -6,7 +6,12 @@ struct Time
     long minute;
     long seconde;    
     bool valide;
+    bool operator==(const Time &other)
+    {
+        return false;
+    }
 } ;
+
 
 struct TimeConfig
 {
