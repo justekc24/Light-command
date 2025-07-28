@@ -1,4 +1,5 @@
 #pragma once
+#include <string> // bibliothèque inclue pour initialiser le temps 
 
 struct Time
 {
@@ -30,7 +31,7 @@ struct TimeConfig
 
 
 
-void timeInit(const char* t, DS3231& rtc) {
+void timeInit(Time *t, DS3231& rtc) {
   // Extraire les heures, minutes et secondes
   int heure = atoi(strtok((char*)t, ":"));
   int minute = atoi(strtok(NULL, ":"));
