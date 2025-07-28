@@ -1,4 +1,6 @@
 #pragma once
+//définition de l'entête indiquand le type de module gsm qui serait utilisé
+//ici le SIM800L
 #define TINY_GSM_MODEM_SIM800
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
@@ -21,6 +23,9 @@ namespace gsm
     
     Time getNowTime()
     {
+        //Ce bloc permet d'initialiser le module gsm
+        //D'initialiser un client en se basant sur ce module
+        // Et de faire les configurations nécessaires pour faire la requête vers l'api de récup de l'heure
         Time now = {0,0,0,false};
         SoftwareSerial gsm_module(RX, TX);
         TinyGsm modem(gsm_module);
@@ -36,7 +41,8 @@ namespace gsm
             now.valide = false;
             return now;
         }
-
+        
+        //lancement de la requête verss l'api
         Serial.println("Requête HTTP...");
         http.get(url);
 
@@ -48,6 +54,7 @@ namespace gsm
         Serial.println("Réponse JSON:");
         Serial.println(response); */
 
+        //jsonification de la réponse envoyé par l'api
         modem.gprsDisconnect();
         DynamicJsonDocument doc(1024);
         DeserializationError error = deserializeJson(doc,response);
@@ -56,6 +63,8 @@ namespace gsm
             now.valide = false;
             return now;
         }
+
+        //Ce bloc sert à extraire l'heure de la chaine de caractère envoyé par l'api.
         String data = doc["formatted"];
         data = data.substring(11,19);
         String para;

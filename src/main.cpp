@@ -38,11 +38,9 @@ void handleRoot()
 
 void configSetup()
 {
-  Serial.println("Requête effectué");
   if (server.hasArg("plain"))
   {
     String json = server.arg("plain");
-    Serial.println(json);
     server.send(200, "application/json", "{\"status\" : \"succes\",\"Données\" : "+json+"}");
     config = convertToTimeConfig(json);
     config.isvalide = false;
@@ -58,6 +56,12 @@ void configSetup()
 
 void timeGet()
 {
+  if(t.heure < 10)
+    server.send(200, "application/json", "{\"heure\": 0" + String(t.heure) + ",\"minute\":" + String(t.minute) + ",\"seconde\":" + String(t.seconde) + "}");
+  if(t.minute < 10)
+    server.send(200, "application/json", "{\"heure\":" + String(t.heure) + ",\"minute\": 0" + String(t.minute) + ",\"seconde\":" + String(t.seconde) + "}");
+  if(t.seconde < 10)
+    server.send(200, "application/json", "{\"heure\":" + String(t.heure) + ",\"minute\":" + String(t.minute) + ",\"seconde\": 0" + String(t.seconde) + "}");
   server.send(200, "application/json", "{\"heure\":" + String(t.heure) + ",\"minute\":" + String(t.minute) + ",\"seconde\":" + String(t.seconde) + "}");
 }
 
@@ -82,29 +86,23 @@ void setup()
   WiFi.mode(WIFI_OFF);
   delay(1000);
 
-  //Init de la configuration si elle est dans l'eeprom
+  //Chargement de la configuration si elle est dans l'eeprom
   if(loadTimeConfigToEEPROM().isvalide)
   {
     config = loadTimeConfigToEEPROM();
   }
   else //sinon config par défaut
   {
-    config.onTime = Time{19,0,0,true};
+    config.onTime = Time{20,0,0,true};
     config.ofTime = Time{7,0,0,true};
   }
 
-  // INIT du temps grâce au gsm
+  // Récupération du temps réel actuel en ligne grâce au gsm
   t = gsm::getNowTime();
 
-  //initialisation manuelle de l'heure du module rtc grâce à l'heure que le module gsm
+  //Réglage manuelle de l'heure du module rtc grâce à l'heure que le module gsm à récupéré en ligne
   setupTimeToRTC(t,rtc);
-
-  Serial.print(t.heure);
-  Serial.print("h ");
-  Serial.print(t.minute);
-  Serial.print("min ");
-  Serial.print(t.seconde);
-  Serial.print("s");
+  printTime(t);
 
   // Réactiver le WiFi
   Serial.println("Starting WiFi AP...");
@@ -114,6 +112,7 @@ void setup()
   Serial.print("AP IP: ");
   Serial.println(ip);
 
+  //configuration des routes du serveur et initialisation du serveur
   server.on("/", handleRoot);
   server.on("/config", HTTP_POST, configSetup);
   server.on("/time", HTTP_GET, timeGet);

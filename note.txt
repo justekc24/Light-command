@@ -1,1 +1,3 @@
-- resoudre 
+- resoudre le gsm qui recupère une mauvaise heure
+- stocker dans l'eeprom
+- 

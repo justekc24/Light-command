@@ -8,9 +8,233 @@ const char code[] PROGMEM = R"rawliteral(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YoupiLight</title>
     <style>
-        input {
-            width: 100%;
-        }
+/* Styles généraux */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 960px;
+    margin: auto;
+    overflow: hidden;
+    padding: 0 20px;
+}
+
+/* En-tête */
+header {
+    background: #2c3e50;
+    color: #ffffff;
+    padding-top: 20px;
+    min-height: 70px;
+    border-bottom: #7f8c8d 3px solid;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+header h1 {
+    float: left;
+    margin: 0;
+    padding: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+header nav {
+    float: right;
+    margin-top: 10px;
+}
+
+header ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+header li {
+    display: inline;
+    padding: 0 15px;
+}
+
+header a {
+    color: #ffffff;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 16px;
+    transition: color 0.3s ease-in-out;
+}
+
+header a:hover {
+    color: #ecf0f1;
+}
+
+/* Section principale */
+main {
+    padding: 20px;
+    flex: 1;
+}
+
+section {
+    background: #ffffff;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+    color: #34495e;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Heure actuelle */
+section:nth-of-type(1) p {
+    font-size: 3em;
+    text-align: center;
+    font-weight: bold;
+    color: #2980b9;
+    letter-spacing: 2px;
+    margin: 20px 0;
+}
+
+/* Formulaires */
+form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+fieldset {
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: #fcfcfc;
+}
+
+legend {
+    font-weight: bold;
+    color: #34495e;
+    padding: 0 10px;
+    background-color: #ffffff;
+    border-radius: 3px;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.05);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: bold;
+}
+
+input[type="number"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color 0.3s ease;
+}
+
+input[type="number"]:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+/* Boutons */
+button {
+    background-color: #3498db;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-right: 10px;
+}
+
+button:hover:not(:disabled) {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+/* Section commande lampe */
+article {
+    text-align: center;
+}
+
+#etat_lampe {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #e74c3c; /* Rouge pour éteinte */
+}
+
+/* Pied de page */
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #2c3e50;
+    color: #ffffff;
+    border-top: #7f8c8d 3px solid;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+}
+
+/* Media Queries pour la réactivité */
+@media (min-width: 768px) {
+    form {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    header h1,
+    header nav {
+        float: none;
+        text-align: center;
+        width: 100%;
+    }
+
+    header nav ul {
+        padding: 10px 0;
+    }
+
+    header li {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    section {
+        padding: 15px;
+    }
+
+    button {
+        display: block;
+        width: calc(100% - 20px);
+        margin: 10px auto;
+    }
+}
     </style>
 </head>
 <body>
@@ -128,8 +352,8 @@ if(configForm) {
             on_minute : parseInputToInt(on_minute.value),
             on_seconde : parseInputToInt(on_seconde.value),
             off_heure : parseInputToInt(off_heure.value),
-            off_minute : parseInputToInt(off_heure.value),
-            off_seconde : parseInputToInt(off_heure.value),
+            off_minute : parseInputToInt(off_minute.value),
+            off_seconde : parseInputToInt(off_seconde.value),
        }
         console.log("Données prêtes à être envoyées : ",configElValuesObject);
         sendConfig(configElValuesObject,url_config);
@@ -154,6 +378,7 @@ async function sendConfig(config,url) {
         body : JSON.stringify(config)
     }
     try {
+            
         const response = await fetch(url,options);
         if(!response.ok) {
             throw new Error (`Erreur HTTP ! status : ${response.status}`);
