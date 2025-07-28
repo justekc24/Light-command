@@ -7,7 +7,7 @@
 const int EEPROM_SIZE = 512;
 const int CONFIG_ADDRESS = 0;
 
-void saveTimeConfig(const TimeConfig &config)
+void saveTimeConfigToEEPROM(const TimeConfig &config)
 {
     EEPROM.begin(EEPROM_SIZE);
     EEPROM.put(CONFIG_ADDRESS,config);
@@ -15,7 +15,7 @@ void saveTimeConfig(const TimeConfig &config)
     EEPROM.end();
 }
 
-TimeConfig loadTimeCongig()
+TimeConfig loadTimeCongigToEEPROM()
 {
     TimeConfig config;
     EEPROM.begin(EEPROM_SIZE);

@@ -25,22 +25,12 @@ struct TimeConfig
 {
     Time onTime ;
     Time ofTime;
-    bool isvalide;
+    bool isvalide = false;
 };
-// 
-//"{on_heure: 3, on_minute: 2, on_seconde: 2, off_heure: 2, off_minute: 2, on_seconde : 2}"
-
-
 
 TimeConfig convertToTimeConfig(const String &str)
 {
     TimeConfig cfg;
-    cfg.onTime.heure = 3;
-    cfg.onTime.minute = 2;
-    cfg.onTime.seconde = 2;
-    cfg.ofTime.heure = 2;
-    cfg.ofTime.minute = 2;
-    cfg.ofTime.seconde = 2;
     return cfg;
 }
 
