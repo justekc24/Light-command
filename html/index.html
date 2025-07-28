@@ -127,7 +127,7 @@ if(configForm) {
             off_seconde : parseInputToInt(off_heure.value),
        }
         console.log(configElValuesObject);
-        sendConfig(configElValuesObject);
+        sendConfig(url_config,configElValuesObject);
 
     });
    
@@ -138,8 +138,6 @@ function parseInputToInt(data) {
     const parsed = parseInt(data, 10);
     return isNaN(parsed) ? 0 : parsed;
 }
-
-
 
 async function sendConfig(config,url) {
     const options = {
