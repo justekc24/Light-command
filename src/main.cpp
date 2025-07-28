@@ -93,5 +93,5 @@ void loop()
       digitalWrite(LAMP_PIN,!digitalRead(LAMP_PIN));
     }
   }
-  server.handleClient();
+  //server.handleClient();
 }
