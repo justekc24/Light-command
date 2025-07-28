@@ -15,7 +15,7 @@ int main() {
         return 1;
     }
     
-    output << "#pragma once";
+    output << "#pragma once\n";
     output <<"#include <Arduino.h>\n";
     output << "const char code[] PROGMEM = R\"rawliteral(\n";
 

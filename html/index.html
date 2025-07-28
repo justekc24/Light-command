@@ -69,6 +69,7 @@ async function getTime(url) {
             throw new Error (`Erreur lors de la récupération du temps : ${response.status}`);
         }
         const data  = await response.json();
+        console.log(data);
         if (data) return data;
     } catch (err) {
         console.log("Erreur : ",err.message)
