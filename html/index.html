@@ -97,8 +97,73 @@ async function displayTime(data) {
 const time = getTime(url_time);
 displayTime(time);
 // ==== Fin de la section d'affichage du temps ====
+</script>
+<script>
+    
+let on_heure = document.getElementById('on_heure');
+let on_minute = document.getElementById('on_minute');
+let on_seconde = document.getElementById('on_seconde');
+let off_heure = document.getElementById('off_heure');
+let off_minute = document.getElementById('off_minute');
+let off_seconde = document.getElementById('off_seconde');
+let etat_lampe = document.getElementById('etat_lampe');
+let btnCommande = document.getElementById('btn_commande');
+let btnReglage = document.getElementById('btn_reglage');
+let configForm = document.getElementById("config-form");
 
-    </script>
+
+const url_config = "/config";
+// ==== Recupération des données du formulaire et envoi ====
+
+if(configForm) {
+    configForm.addEventListener('submit', (e)=> {
+        e.preventDefault();
+       let configElValuesObject = {
+            on_heure : parseInputToInt(on_heure.value),
+            on_minute : parseInputToInt(on_minute.value),
+            on_seconde : parseInputToInt(on_seconde.value),
+            off_heure : parseInputToInt(off_heure.value),
+            off_minute : parseInputToInt(off_heure.value),
+            off_seconde : parseInputToInt(off_heure.value),
+       }
+        console.log(configElValuesObject);
+        sendConfig(configElValuesObject);
+
+    });
+   
+}
+
+
+function parseInputToInt(data) {
+    const parsed = parseInt(data, 10);
+    return isNaN(parsed) ? 0 : parsed;
+}
+
+
+
+async function sendConfig(config,url) {
+    const options = {
+        method : 'POST',
+        headers : {
+            'content-type' : 'application/json'
+        },
+        body : JSON.stringify(config)
+    }
+    try {
+        const response = await fetch(url,options);
+        if(!response.ok) {
+            throw new Error (`Erreur HTTP ! status : ${response.status}`);
+        }
+        const responseData = await response.json();
+        console.log('Données envoyées : ',responseData);
+        if(responseData = !{}) return responseData;   
+    }
+    catch(err) {
+        console.log("Erreur lors de l'envoi de la configuration : ",err)
+        throw err;
+    }
+}
+</script>
     <!--script src="time.js" ></script>
     <script src="commandes.js"></script>
     <script src="config.js"></script-->
