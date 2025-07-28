@@ -1,89 +1,110 @@
 #pragma once
-
 #include <Arduino.h>
-
 const char code[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YoupiLight</title>
+    <style>
+        input {
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>YoupiLight</h1>
+        <h1>YOUPILIGHT</h1>
         <nav>
             <ul>
-                <li><a href="#reglage">Réglages</a></li>
+                <li><a href="#reglages">Réglages</a></li>
                 <li><a href="#commandes">Commandes</a></li>
             </ul>
         </nav>
     </header>
     <main>
-        <section id="time">
-            <h2>Heure locale</h2>
-            <p><span id="heure">---</span> : <span id="minute">---</span> : <span id="seconde">---</span></p>
+        <section>
+            <h2>Heure actuelle</h2>
+            <p><span id="heure">---</span> : <span id="minute">---</span> : <span id="seconde"> ---</span></p>
         </section>
-        
+        <section>
+            <h2>Réglages horaires</h2>
+            <form id="config-form">
+            <fieldset>
+                <legend><strong>Allumage</strong></legend>
+                <label for="on_heure">Heure</label><input type="number" id="on_heure" placeholder="Entrer l'heure ici ..." min="0" max="23" required><br>
+                <label for="on_minute">Minute</label><input type="number" id="on_minute" placeholder="Entrer la minute ici ..." min="0" max="59" required><br>
+                <label for="on_seconde">Seconde</label><input type="number" id="on_seconde" placeholder="Entrer la seconde ici ..." min="0" max="59" required>
+            </fieldset>
+            <fieldset>
+                <legend><strong>Extinction</strong></legend>
+                <label for="off_heure">Heure</label><input type="number" id="off_heure" placeholder="Entrer l'heure ici ..." min="0" max="23" required><br>
+                <label for="off_minute">Minute</label><input type="number" id="off_minute" placeholder="Entrer la minute ici ..." min="0" max="59" required><br>
+                <label for="off_seconde">Seconde</label><input type="number" id="off_seconde" placeholder="Entrer la seconde ici ..." min="0" max="59" required>
+            </fieldset>
+            <button type="submit" id="btn_reglage">Envoyer le réglage</button>
+            </form>
+        </section>
+        <section>
+            <h2>Commande de la lampe</h2>
+            <article>
+                <p>Etat de la lampe : <span id="etat_lampe"><strong>Eteinte</strong></span></p>
+                <button id="on_lampe">Allumer</button>
+                <button id="off_lampe" disabled>Eteindre</button>
+            </article>
+        </section>
     </main>
-    <script defer>
-        async function getData(url) {
-            try {
-                const response = await fetch(url);
-                if(!response.ok) {
-                    throw new Error(`Erreur HTTP : ${response.status}`);
-                }
-                const data = await response.json();
-                console.log('Données récupérées : ',data);
-                return data
-            }
-            catch (err) {
-                console.log("Erreur lors de la récupération des données", err);
-            }
+    <footer>
+        <p>&copy; YoupiLight - 2025 - Tous droits réservés</p>
+    </footer>
+    <script>
+        let heureEl = document.getElementById('heure');
+let minuteEl = document.getElementById('minute');
+let secondeEl = document.getElementById('seconde');
+const url_time = "/time";
+// ==== GESTION DE L'AFFICHAGE DE L'HEURE ====
+// Fonction pour recevoir le temps du module RTC 
+async function getTime(url) {
+    try {
+        const response = await fetch(url);
+        if(!response.ok) {
+            throw new Error (`Erreur lors de la récupération du temps : ${response.status}`);
         }
-        /* ===== Récupération des éléments du DOM pour l'affichage du temps ===== */
-        const heureEl = document.getElementById('heure');
-        const minuteEl = document.getElementById("minute");
-        const secondeEl = document.getElementById("seconde");
-        let url_time = '/time';
+        const data  = await response.json();
+        console.log(data);
+        if (data) return data;
+    } catch (err) {
+        console.log("Erreur : ",err.message)
+    }
+}
 
-        // Récupération de l'heure depuis l'api
-        // Il faut attendre que la promesse soit résolue pour accéder aux données
-        async function displayTime() { // Créez une fonction asynchrone pour utiliser await
-            const dataObject = await getData(url_time); // Utilisez await ici
-
-            if (dataObject) { // Vérifiez si dataObject n'est pas undefined (en cas d'erreur de récupération)
-                // Injection des données du temps
-                let minute = dataObject.minute;
-                let heure = dataObject.heure;
-                let seconde = dataObject.seconde;
-
-                heureEl.textContent = heure || "---";
-                minuteEl.textContent = minute || "---";
-                secondeEl.textContent = seconde || "---";
-            }
+// Fonction pour afficher le temps reçu
+async function displayTime(data) {
+    try {
+        const dataObject = await data;
+        if (dataObject) {
+            let heure = dataObject.heure;
+            let minute = dataObject.minute;
+            let seconde = dataObject.seconde;
+            // Injection des données 
+            minuteEl.textContent = minute || "___";
+            heureEl.textContent = heure || "___";
+            secondeEl.textContent = seconde || "___";            
         }
+    }catch (err) {
+        console.log("Erreur d'affichage :" ,err.message);
+    }
+}
 
-        displayTime(); // Appelez la fonction pour afficher l'heure
+const time = getTime(url_time);
+displayTime(time);
+// ==== Fin de la section d'affichage du temps ====
+
     </script>
+    <!--script src="time.js" ></script>
+    <script src="commandes.js"></script>
+    <script src="config.js"></script-->
 </body>
 </html>
 )rawliteral";
-
-/*
-AT                       // Test communication
-AT+CPIN?                 // Vérifie si la carte SIM est prête
-AT+CSQ                   // Vérifie le niveau du signal
-AT+CREG?                 // Vérifie l'enregistrement réseau
-AT+SAPBR=3,1,"CONTYPE","GPRS"     // Définit le mode de connexion
-AT+SAPBR=3,1,"APN","internet"     // Remplace "internet" par l’APN de ton opérateur
-AT+SAPBR=1,1                      // Ouvre la connexion GPRS
-AT+SAPBR=2,1                      // Vérifie l’état de la connexion
-AT+HTTPINIT                      // Initialise HTTP
-AT+HTTPPARA="CID",1              // Définit le profil de connexion
-AT+HTTPPARA="URL","http://api.example.com/data"
-AT+HTTPACTION=0                  // 0 = GET, 1 = POST
-AT+HTTPREAD                      // Lit la réponse du serveur
-AT+HTTPTERM                      // Termine la session HTTP
-*/

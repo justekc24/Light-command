@@ -9,13 +9,15 @@ int main() {
         return 1;
     }
 
-    std::ofstream output("generated_html.h");
+    std::ofstream output("../src/page.h");
     if (!output) {
         std::cerr << "Erreur lors de la création du fichier de sortie." << std::endl;
         return 1;
     }
+    
+    output << "#pragma once\n";
     output <<"#include <Arduino.h>\n";
-    output << "const char index_html[] PROGMEM = R\"rawliteral(\n";
+    output << "const char code[] PROGMEM = R\"rawliteral(\n";
 
     std::string line;
     while (std::getline(input, line)) {
