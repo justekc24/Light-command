@@ -3,235 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YoupiLight</title>
+    <title>YOUPILIGHT</title>
     <style>
-/* Styles généraux */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f7f6;
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
+        /* Styles généraux */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-.container {
-    width: 90%;
-    max-width: 960px;
-    margin: auto;
-    overflow: hidden;
-    padding: 0 20px;
-}
+        /* En-tête */
+        header {
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-/* En-tête */
-header {
-    background: #2c3e50;
-    color: #ffffff;
-    padding-top: 20px;
-    min-height: 70px;
-    border-bottom: #7f8c8d 3px solid;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+        }
 
-header h1 {
-    float: left;
-    margin: 0;
-    padding: 0;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
+        header nav ul {
+            padding: 0;
+            list-style: none;
+            margin-top: 10px;
+        }
 
-header nav {
-    float: right;
-    margin-top: 10px;
-}
+        header nav ul li {
+            display: inline;
+            margin: 0 15px;
+        }
 
-header ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
+        header nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
 
-header li {
-    display: inline;
-    padding: 0 15px;
-}
+        header nav ul li a:hover {
+            color: #1abc9c;
+        }
 
-header a {
-    color: #ffffff;
-    text-decoration: none;
-    text-transform: uppercase;
-    font-size: 16px;
-    transition: color 0.3s ease-in-out;
-}
+        /* Contenu principal */
+        main {
+            flex: 1;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
 
-header a:hover {
-    color: #ecf0f1;
-}
+        section {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: #fcfcfc;
+        }
 
-/* Section principale */
-main {
-    padding: 20px;
-    flex: 1;
-}
+        section h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #1abc9c;
+            padding-bottom: 10px;
+        }
 
-section {
-    background: #ffffff;
-    padding: 25px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
+        /* Section Heure actuelle */
+        section:first-of-type p {
+            font-size: 3em;
+            text-align: center;
+            font-weight: bold;
+            color: #1abc9c;
+            letter-spacing: 3px;
+        }
 
-h2 {
-    color: #34495e;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
+        /* Formulaires et champs */
+        form#config-form fieldset {
+            border: 1px solid #d0d0d0;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 6px;
+            background-color: #fff;
+        }
 
-/* Heure actuelle */
-section:nth-of-type(1) p {
-    font-size: 3em;
-    text-align: center;
-    font-weight: bold;
-    color: #2980b9;
-    letter-spacing: 2px;
-    margin: 20px 0;
-}
+        form#config-form legend {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.2em;
+            padding: 0 10px;
+            background-color: #fcfcfc;
+            border-radius: 4px;
+        }
 
-/* Formulaires */
-form {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-}
+        form#config-form label {
+            display: inline-block;
+            width: 80px;
+            margin-bottom: 0.8rem;
+            color: #555;
+            font-weight: 500;
+        }
 
-fieldset {
-    border: 1px solid #bdc3c7;
-    border-radius: 5px;
-    padding: 20px;
-    background-color: #fcfcfc;
-}
+        form#config-form input[type="number"] {
+            width: calc(100% - 100px); /* Ajuster la largeur en fonction du label */
+            padding: 10px;
+            margin-bottom: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
 
-legend {
-    font-weight: bold;
-    color: #34495e;
-    padding: 0 10px;
-    background-color: #ffffff;
-    border-radius: 3px;
-    box-shadow: 0 2px 3px rgba(0,0,0,0.05);
-}
+        form#config-form input[type="number"]:focus {
+            border-color: #1abc9c;
+            outline: none;
+            box-shadow: 0 0 5px rgba(26, 188, 156, 0.3);
+        }
 
-label {
-    display: block;
-    margin-bottom: 8px;
-    color: #555;
-    font-weight: bold;
-}
+        /* Boutons */
+        button {
+            background-color: #1abc9c;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-right: 10px;
+        }
 
-input[type="number"] {
-    width: calc(100% - 20px);
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 1em;
-    transition: border-color 0.3s ease;
-}
+        button:hover {
+            background-color: #16a085;
+            transform: translateY(-2px);
+        }
 
-input[type="number"]:focus {
-    border-color: #3498db;
-    outline: none;
-    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-}
+        button:active {
+            transform: translateY(0);
+        }
 
-/* Boutons */
-button {
-    background-color: #3498db;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1.1em;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-right: 10px;
-}
+        #btn_reglage {
+            display: block;
+            width: 100%;
+            margin-top: 2rem;
+            background-color: #2c3e50;
+        }
 
-button:hover:not(:disabled) {
-    background-color: #2980b9;
-    transform: translateY(-2px);
-}
+        #btn_reglage:hover {
+            background-color: #34495e;
+        }
 
-button:active:not(:disabled) {
-    transform: translateY(0);
-}
+        #on_lampe {
+            background-color: #28a745; /* Vert pour Allumer */
+        }
 
-button:disabled {
-    background-color: #95a5a6;
-    cursor: not-allowed;
-}
+        #on_lampe:hover {
+            background-color: #218838;
+        }
 
-/* Section commande lampe */
-article {
-    text-align: center;
-}
+        #off_lampe {
+            background-color: #dc3545; /* Rouge pour Éteindre */
+        }
 
-#etat_lampe {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #e74c3c; /* Rouge pour éteinte */
-}
+        #off_lampe:hover {
+            background-color: #c82333;
+        }
 
-/* Pied de page */
-footer {
-    text-align: center;
-    padding: 20px;
-    background: #2c3e50;
-    color: #ffffff;
-    border-top: #7f8c8d 3px solid;
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
-}
+        /* État de la lampe */
+        #etat_lampe {
+            font-size: 1.2em;
+            margin-right: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
 
-/* Media Queries pour la réactivité */
-@media (min-width: 768px) {
-    form {
-        grid-template-columns: 1fr 1fr;
-    }
-}
+        /* Pied de page */
+        footer {
+            background-color: #2c3e50;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-@media (max-width: 600px) {
-    header h1,
-    header nav {
-        float: none;
-        text-align: center;
-        width: 100%;
-    }
-
-    header nav ul {
-        padding: 10px 0;
-    }
-
-    header li {
-        display: block;
-        margin-bottom: 5px;
-    }
-
-    section {
-        padding: 15px;
-    }
-
-    button {
-        display: block;
-        width: calc(100% - 20px);
-        margin: 10px auto;
-    }
-}
+        footer p {
+            margin: 0;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -247,9 +220,9 @@ footer {
     <main>
         <section>
             <h2>Heure actuelle</h2>
-            <p><span id="heure">---</span> : <span id="minute">---</span> : <span id="seconde"> ---</span></p>
+            <p><span id="heure">--</span> : <span id="minute">--</span> : <span id="seconde">--</span></p>
         </section>
-        <section>
+        <section id="reglages">
             <h2>Réglages horaires</h2>
             <form id="config-form">
             <fieldset>
@@ -267,12 +240,12 @@ footer {
             <button type="submit" id="btn_reglage">Envoyer le réglage</button>
             </form>
         </section>
-        <section>
+        <section id="commandes">
             <h2>Commande de la lampe</h2>
             <article>
-                <p>Etat de la lampe : <span id="etat_lampe"><strong>Eteinte</strong></span></p>
+                <p>État de la lampe : <span id="etat_lampe"><strong>Éteinte</strong></span></p>
                 <button id="on_lampe">Allumer</button>
-                <button id="off_lampe" disabled>Eteindre</button>
+                <button id="off_lampe" >Éteindre</button>
             </article>
         </section>
     </main>
@@ -391,8 +364,5 @@ async function sendConfig(config,url) {
     }
 }
 </script>
-    <!--script src="time.js" ></script>
-    <script src="commandes.js"></script>
-    <script src="config.js"></script-->
 </body>
 </html>
