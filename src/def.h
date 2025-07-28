@@ -8,7 +8,15 @@ struct Time
     bool valide;
     bool operator==(const Time &other)
     {
-        return false;
+        if (other.heure == heure &&
+            other.minute == minute &&
+            other.seconde == seconde &&
+            other.valide == valide)
+        {
+        return 1;
+        } else {
+            return 0; 
+        }
     }
 } ;
 
