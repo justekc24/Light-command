@@ -1,3 +1,5 @@
+#include <Arduino.h>
+const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -103,3 +105,4 @@ displayTime(time);
     <script src="config.js"></script-->
 </body>
 </html>
+)rawliteral";
