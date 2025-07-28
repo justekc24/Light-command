@@ -129,7 +129,7 @@ if(configForm) {
             off_minute : parseInputToInt(off_heure.value),
             off_seconde : parseInputToInt(off_heure.value),
        }
-        console.log(configElValuesObject);
+        console.log("Données prêtes à être envoyées : ",configElValuesObject);
         sendConfig(configElValuesObject,url_config);
 
     });
@@ -156,8 +156,9 @@ async function sendConfig(config,url) {
             throw new Error (`Erreur HTTP ! status : ${response.status}`);
         }
         const responseData = await response.json();
-        console.log('Données envoyées : ',responseData);
-        if(responseData = !{}) return responseData;   
+        console.log("Données envoyées");
+        console.log(responseData);
+        if(responseData) return responseData;   
     }
     catch(err) {
         console.log("Erreur lors de l'envoi de la configuration : ",err)

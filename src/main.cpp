@@ -27,7 +27,7 @@ void configSetup()
   {
     String json = server.arg("plain");
     Serial.println(json);
-    server.send(200, "application/json", "{\"status\" : \"succes\"}");
+    server.send(200, "application/json", "{\"status\" : \"succes\",\"Données\" : "+json+"}");
   }
   else
   {
@@ -63,7 +63,7 @@ void setup()
   delay(1000);
 
   // INIT DU GSM
- // t = gsm::getNowTime();
+  t = gsm::getNowTime();
   //setupTime(gsm_time);
 
   Serial.print(t.heure);
@@ -91,3 +91,4 @@ void loop()
 {
   server.handleClient();
 }
+
