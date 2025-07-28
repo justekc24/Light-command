@@ -38,7 +38,6 @@ void handleRoot()
 
 void configSetup()
 {
-  digitalWrite(LAMP_PIN,1);
   Serial.println("Requête effectué");
   if (server.hasArg("plain"))
   {
