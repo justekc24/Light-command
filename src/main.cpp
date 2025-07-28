@@ -10,7 +10,7 @@
 const char *ssid = "esp8266 wifi";
 const char *password = "isniis";
 
-Time t;
+Time t = {10,20,30,true};
 ESP8266WebServer server;
 TimeConfig config;
 
@@ -60,8 +60,8 @@ void setup()
   delay(1000);
 
   // INIT DU GSM
-  Time gsm_time = gsm::getNowTime();
-  setupTime(gsm_time);
+  t = gsm::getNowTime();
+  //setupTime(gsm_time);
 
   Serial.print(t.heure);
   Serial.print("h ");
@@ -86,12 +86,5 @@ void setup()
 
 void loop()
 {
-  if(config.isvalide)
-  {
-    if(t == config.ofTime || t == config.onTime)
-    {
-      digitalWrite(LAMP_PIN,!digitalRead(LAMP_PIN));
-    }
-  }
   server.handleClient();
 }
