@@ -130,7 +130,7 @@ if(configForm) {
             off_seconde : parseInputToInt(off_heure.value),
        }
         console.log(configElValuesObject);
-        sendConfig(url_config,configElValuesObject);
+        sendConfig(configElValuesObject,url_config);
 
     });
    

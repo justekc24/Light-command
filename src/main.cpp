@@ -21,6 +21,8 @@ void handleRoot()
 
 void configSetup()
 {
+  digitalWrite(LAMP_PIN,1);
+  Serial.println("Requête effectué");
   if (server.hasArg("plain"))
   {
     String json = server.arg("plain");
@@ -52,6 +54,7 @@ void timeGet()
 void setup()
 {
   pinMode(LAMP_PIN,OUTPUT);
+  digitalWrite(LAMP_PIN,0);
   Serial.begin(115200);
   Serial.println("\n\nStarting setup...");
 
@@ -60,7 +63,7 @@ void setup()
   delay(1000);
 
   // INIT DU GSM
-  t = gsm::getNowTime();
+ // t = gsm::getNowTime();
   //setupTime(gsm_time);
 
   Serial.print(t.heure);
