@@ -21,6 +21,15 @@ Time t = {10,20,30,true};
 ESP8266WebServer server;
 TimeConfig config ;
 
+void printTime(const Time &t)
+{
+    Serial.print(t.heure);
+    Serial.print(" h ");
+    Serial.print(t.minute);
+    Serial.print(" min ");
+    Serial.print(t.seconde);
+    Serial.println(" s");
+}
 
 void handleRoot()
 {
@@ -37,8 +46,10 @@ void configSetup()
     Serial.println(json);
     server.send(200, "application/json", "{\"status\" : \"succes\",\"Données\" : "+json+"}");
     config = convertToTimeConfig(json);
+    config.isvalide = false;
     saveTimeConfigToEEPROM(config);
-    
+    Serial.println("==================");
+    printTime(config.onTime);
   }
   else
   {
@@ -59,7 +70,6 @@ void setup()
     Serial.println("Impossible de trouver le module RTC");
     while (1);
   }
-  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
   //init de la lampe
   pinMode(LAMP_PIN,OUTPUT);
@@ -74,9 +84,9 @@ void setup()
   delay(1000);
 
   //Init de la configuration si elle est dans l'eeprom
-  if(loadTimeCongigToEEPROM().isvalide)
+  if(loadTimeConfigToEEPROM().isvalide)
   {
-    config = loadTimeCongigToEEPROM();
+    config = loadTimeConfigToEEPROM();
   }
   else //sinon config par défaut
   {
@@ -116,14 +126,12 @@ void loop()
   server.handleClient();
   if(millis() - now > INTERVALLE)
   {
-    Serial.print(getHeureActuelleToRTC(rtc).heure);
-    Serial.print(" h ");
-    Serial.print(getHeureActuelleToRTC(rtc).minute);
-    Serial.print(" min ");
-    Serial.print(getHeureActuelleToRTC(rtc).seconde);
-    Serial.println(" s");
-    digitalWrite(LAMP_PIN,!digitalRead(LAMP_PIN));
+    printTime(t);
+    t = getHeureActuelleToRTC(rtc);
+    if(config.onTime < t)
+    {
+      digitalWrite(LAMP_PIN,1);
+    }
     now = millis();
   }
 }
-

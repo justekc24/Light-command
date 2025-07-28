@@ -88,17 +88,19 @@ async function displayTime(data) {
             let minute = dataObject.minute;
             let seconde = dataObject.seconde;
             // Injection des données 
-            minuteEl.textContent = minute || "___";
-            heureEl.textContent = heure || "___";
-            secondeEl.textContent = seconde || "___";            
+            minuteEl.textContent = minute || "00";
+            heureEl.textContent = heure || "00";
+            secondeEl.textContent = seconde || "00";            
         }
     }catch (err) {
         console.log("Erreur d'affichage :" ,err.message);
     }
-}
+};
+setInterval(() => {
+    const time = getTime(url_time);
+    displayTime(time);
+},1000);
 
-const time = getTime(url_time);
-displayTime(time);
 // ==== Fin de la section d'affichage du temps ====
 </script>
 <script>
@@ -131,6 +133,7 @@ if(configForm) {
        }
         console.log("Données prêtes à être envoyées : ",configElValuesObject);
         sendConfig(configElValuesObject,url_config);
+        configForm.reset();
 
     });
    

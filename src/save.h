@@ -15,7 +15,7 @@ void saveTimeConfigToEEPROM(const TimeConfig &config)
     EEPROM.end();
 }
 
-TimeConfig loadTimeCongigToEEPROM()
+TimeConfig loadTimeConfigToEEPROM()
 {
     TimeConfig config;
     EEPROM.begin(EEPROM_SIZE);

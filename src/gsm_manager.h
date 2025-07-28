@@ -29,6 +29,7 @@ namespace gsm
         gsm_module.begin(9600);
         Serial.println("Initialisation du modem...");
         modem.restart();
+        delay(3000);
         Serial.println("Connexion au réseau...");
         if (!modem.gprsConnect(apn, "", "")) {
             Serial.println("Échec GPRS");
