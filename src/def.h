@@ -4,9 +4,9 @@
 
 struct Time
 {
-    long heure;
-    long minute;
-    long seconde;    
+    unsigned long heure;
+    unsigned long minute;
+    unsigned long seconde;    
     bool valide;
 
     bool operator<(const Time &other) const

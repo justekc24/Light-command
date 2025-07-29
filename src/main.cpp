@@ -47,7 +47,10 @@ void configSetup()
     config.isvalide = false;
     saveTimeConfigToEEPROM(config);
     Serial.println("==================");
+    Serial.println("On Time");
     printTime(config.onTime);
+    Serial.println("Off Time");
+    printTime(config.ofTime);
   }
   else
   {
@@ -58,6 +61,26 @@ void configSetup()
 void timeGet()
 {
   server.send(200, "application/json", "{\"heure\":" + String(t.heure) + ",\"minute\":" + String(t.minute) + ",\"seconde\":" + String(t.seconde) + "}");
+}
+
+void command()
+{
+  if(server.hasArg("plain"))
+  {
+    String json = server.arg("plain");
+    server.send(200,"text/json","{\"status\" : \"succes\"}");
+    DynamicJsonDocument doc(1024);
+    DeserializationError error = deserializeJson(doc,json);
+    if(error)
+    {
+      Serial.println("Erreur de désérialisation");
+    }
+    digitalWrite(LAMP_PIN,doc["etat"]);
+  }
+  else
+  {
+    server.send(404,"text/json", "{\"status\" : \"echec\"}");
+  }
 }
 
 void setup()
@@ -94,6 +117,7 @@ void setup()
 
   // Récupération du temps réel actuel en ligne grâce au gsm
   t = gsm::getNowTime();
+  t.valide = true;
 
   //Réglage manuelle de l'heure du module rtc grâce à l'heure que le module gsm à récupéré en ligne
   setupTimeToRTC(t,rtc);
@@ -111,6 +135,7 @@ void setup()
   server.on("/", handleRoot);
   server.on("/config", HTTP_POST, configSetup);
   server.on("/time", HTTP_GET, timeGet);
+  server.on("/commands",HTTP_POST,command);
   server.begin();
 }
 
@@ -121,7 +146,7 @@ void loop()
   {
     printTime(t);
     t = getHeureActuelleToRTC(rtc);
-    bool lampState;
+    bool lampState = false;
     updateStateFlexible(config,lampState,t);
     digitalWrite(LAMP_PIN,lampState);
     now = millis();
