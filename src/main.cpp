@@ -8,6 +8,7 @@
 #include "page.h"
 #include "rtc_horloge_manager.h"
 #include "save.h"
+#include "timeManager.h"
 
 #define INTERVALLE 1000
 #define LAMP_PIN 16
@@ -56,12 +57,6 @@ void configSetup()
 
 void timeGet()
 {
-  if(t.heure < 10)
-    server.send(200, "application/json", "{\"heure\": 0" + String(t.heure) + ",\"minute\":" + String(t.minute) + ",\"seconde\":" + String(t.seconde) + "}");
-  if(t.minute < 10)
-    server.send(200, "application/json", "{\"heure\":" + String(t.heure) + ",\"minute\": 0" + String(t.minute) + ",\"seconde\":" + String(t.seconde) + "}");
-  if(t.seconde < 10)
-    server.send(200, "application/json", "{\"heure\":" + String(t.heure) + ",\"minute\":" + String(t.minute) + ",\"seconde\": 0" + String(t.seconde) + "}");
   server.send(200, "application/json", "{\"heure\":" + String(t.heure) + ",\"minute\":" + String(t.minute) + ",\"seconde\":" + String(t.seconde) + "}");
 }
 
@@ -126,10 +121,9 @@ void loop()
   {
     printTime(t);
     t = getHeureActuelleToRTC(rtc);
-    if(config.onTime < t)
-    {
-      digitalWrite(LAMP_PIN,1);
-    }
+    bool lampState;
+    updateStateFlexible(config,lampState,t);
+    digitalWrite(LAMP_PIN,lampState);
     now = millis();
   }
 }

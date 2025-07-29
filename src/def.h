@@ -8,20 +8,8 @@ struct Time
     long minute;
     long seconde;    
     bool valide;
-    bool operator==(const Time &other)
-    {
-        if (other.heure == heure &&
-            other.minute == minute &&
-            other.seconde == seconde &&
-            other.valide == valide)
-        {
-        return 1;
-        } else {
-            return 0; 
-        }
-    }
 
-    bool operator<(const Time &other)
+    bool operator<(const Time &other) const
     {
         if (heure < other.heure) return 1;
         if (heure > other.heure) return 0;
@@ -33,11 +21,22 @@ struct Time
         return 0;
     }
 
-/*     bool operator>(const Time &other)
+    bool operator>(const Time &other) const
     {
-        return false;
-    } */
+        if (heure < other.heure) return 0;
+        if (heure > other.heure) return 1;
 
+        if (minute < other.minute) return 0;
+        if (minute > other.minute) return 1;
+
+        if (seconde < other.seconde) return 0;
+        return 1;
+    }
+
+    bool operator==(const Time &other) const
+    {
+        return (heure == other.heure && minute == other.minute && seconde == other.seconde);
+    }
 } ;
 
 
