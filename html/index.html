@@ -278,9 +278,9 @@ async function displayTime(data) {
     try {
         const dataObject = await data;
         if (dataObject) {
-            let heure = dataObject.heure;
-            let minute = dataObject.minute;
-            let seconde = dataObject.seconde;
+            let heure = dataObject.heure < 10 ? "0" + dataObject.heure : dataObject.heure;
+            let minute = dataObject.minute < 10 ? "0" + dataObject.minute : dataObject.minute;
+            let seconde = dataObject.seconde < 10 ? "0" + dataObject.seconde : dataObject.seconde;
             // Injection des données 
             minuteEl.textContent = minute || "00";
             heureEl.textContent = heure || "00";
