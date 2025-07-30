@@ -79,7 +79,7 @@ void command()
   {
     String json = server.arg("plain");
     server.send(200,"text/json","{\"status\" : \"succes\"}");
-    DynamicJsonDocument doc(1024);
+    JsonDocument doc;
     DeserializationError error = deserializeJson(doc,json);
     if(error)
     {
@@ -103,6 +103,15 @@ void IRAM_ATTR gestionInterruption()
 {
   manuelCommandState = !manuelCommandState;
   digitalWrite(LAMP_PIN,manuelCommandState);
+}
+
+void getConfig()
+{
+  server.send(200,"text/json",String("{")+
+  "\"allumage\":"+
+  "{\"annee\":"+String(config.onTime.annee)+",\"mois\":"+String(config.onTime.mois)+",\"jour\":"+String(config.onTime.jour)+",\"heure\":"+String(config.onTime.heure)+",\"minute\":"+String(config.onTime.minute)+",\"seconde\":"+String(config.onTime.seconde)+"},"+
+  +"\"extinction\": {\"annee\":"+String(config.ofTime.annee)+",\"mois\":"+String(config.ofTime.mois)+",\"jour\":"+String(config.ofTime.jour)+",\"heure\":"+String(config.ofTime.heure)+",\"minute\":"+String(config.ofTime.minute)+",\"seconde\":"+String(config.ofTime.seconde)+"}"+
+  +"}");
 }
 
 void setup()
@@ -159,6 +168,7 @@ void setup()
   server.on("/time", HTTP_GET, timeGet);
   server.on("/lampe",HTTP_POST,command);
   server.on("/state",HTTP_GET,getLampeState);
+  server.on("/get-config",HTTP_GET,getConfig);
   server.begin();
 
   //attach interrupt
