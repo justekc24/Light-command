@@ -388,7 +388,7 @@ const char code[] PROGMEM = R"rawliteral(
                 config.minute,
                 config.seconde
             );
-            
+            window.configData = configDate;
             return configDate > now;
         }
 
@@ -649,11 +649,11 @@ const char code[] PROGMEM = R"rawliteral(
             
             // Vérifier l'état de la lampe
             checkLampeState();
-            setInterval(checkLampeState, 5000);
+            setInterval(checkLampeState, 1000);
             
             // Charger les configurations existantes
             loadCurrentConfig();
-            setInterval(loadCurrentConfig, 30000); // Rafraîchir toutes les 30s
+            setInterval(loadCurrentConfig, 5000); // Rafraîchir toutes les 5s
             
             // Pré-remplir les champs datetime-local avec l'heure actuelle
             const now = new Date();
