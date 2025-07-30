@@ -36,10 +36,13 @@ namespace gsm
         modem.restart();
         delay(3000);
         Serial.println("Connexion au réseau...");
-        if (!modem.gprsConnect(apn, "", "")) {
+        while (!modem.gprsConnect(apn, "", ""))
+        {
             Serial.println("Échec GPRS");
             now.valide = false;
-            return now;
+            modem.restart();
+            delay(3000);
+            Serial.println("Connexion au réseau...");
         }
         
         //lancement de la requête verss l'api
