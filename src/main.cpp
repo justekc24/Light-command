@@ -11,7 +11,8 @@
 #include "timeManager.h"
 
 #define INTERVALLE 1000
-#define LAMP_PIN 16
+#define LAMP_PIN 13
+#define SWITCH_PIN 2
 
 const char *ssid = "esp8266 wifi";
 const char *password = "isniis";
@@ -21,6 +22,7 @@ unsigned long now = 0;
 Time t = {10,20,30,true};
 ESP8266WebServer server;
 TimeConfig config ;
+volatile bool LampState = false;
 
 void printTime(const Time &t)
 {
@@ -75,12 +77,17 @@ void command()
     {
       Serial.println("Erreur de désérialisation");
     }
-    digitalWrite(LAMP_PIN,doc["etat"]);
+    digitalWrite(LAMP_PIN,doc["state"] ? true : false);
   }
   else
   {
     server.send(404,"text/json", "{\"status\" : \"echec\"}");
   }
+}
+
+void getLampeState()
+{
+  server.send(200,"text/json","{\"etat\": "+String(LampState)+"}");
 }
 
 void setup()
@@ -135,7 +142,8 @@ void setup()
   server.on("/", handleRoot);
   server.on("/config", HTTP_POST, configSetup);
   server.on("/time", HTTP_GET, timeGet);
-  server.on("/commands",HTTP_POST,command);
+  server.on("/lampe",HTTP_POST,command);
+  server.on("/state",HTTP_GET,getLampeState);
   server.begin();
 }
 
@@ -151,4 +159,6 @@ void loop()
     digitalWrite(LAMP_PIN,lampState);
     now = millis();
   }
+  digitalWrite(LAMP_PIN,!digitalRead(SWITCH_PIN));
+  LampState = digitalRead(LAMP_PIN);
 }
