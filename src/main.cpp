@@ -27,6 +27,12 @@ volatile bool manuelCommandState = false;
 
 void printTime(const Time &t)
 {
+    Serial.print(t.jour);
+    Serial.print("-");
+    Serial.print(t.mois);
+    Serial.print("-");
+    Serial.print(t.annee);
+    Serial.print(" ");
     Serial.print(t.heure);
     Serial.print(" h ");
     Serial.print(t.minute);
@@ -164,11 +170,10 @@ void loop()
   server.handleClient();
   if(millis() - now > INTERVALLE)
   {
-    //printTime(t);
+    printTime(t);
     t = getHeureActuelleToRTC(rtc);
     bool lampState = false;
     updateStateFlexible(config,lampState,t);
-    //digitalWrite(LAMP_PIN,lampState);
     now = millis();
   }
   LampState = digitalRead(LAMP_PIN);
