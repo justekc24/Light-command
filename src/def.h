@@ -1,14 +1,6 @@
-
 #pragma once
 #include <string>
 #include <ArduinoJson.h>
-
-/*
-{
-  "allumage": {"annee":2025,"mois":7,"jour":30,"heure":10,"minute":59,"seconde":0},
-  "extinction": {"annee":2025,"mois":7,"jour":30,"heure":11,"minute":0,"seconde":0}
-}
-*/
 
 struct Time
 {
@@ -81,6 +73,13 @@ TimeConfig convertToTimeConfig(const String &str) {
   StaticJsonDocument<200> doc;
   DeserializationError error = deserializeJson(doc, str);
 
+/*
+{
+  "allumage": {"annee":2025,"mois":7,"jour":30,"heure":10,"minute":59,"seconde":0},
+  "extinction": {"annee":2025,"mois":7,"jour":30,"heure":11,"minute":0,"seconde":0}
+}
+*/
+
   TimeConfig cfg;
 
   if (error) {
@@ -89,13 +88,21 @@ TimeConfig convertToTimeConfig(const String &str) {
     return cfg;
   }
 
-  cfg.onTime.heure   = doc["on_heure"] | 0;
-  cfg.onTime.minute  = doc["on_minute"] | 0;
-  cfg.onTime.seconde = doc["on_seconde"] | 0;
-
-  cfg.ofTime.heure   = doc["off_heure"] | 0;
-  cfg.ofTime.minute  = doc["off_minute"] | 0;
-  cfg.ofTime.seconde = doc["off_seconde"] | 0;
+  //alummage config
+  cfg.onTime.heure   = doc["allumage"]["heure"] | 0;
+  cfg.onTime.minute  = doc["allumage"]["minute"] | 0;
+  cfg.onTime.seconde = doc["allumage"]["seconde"] | 0;
+  cfg.onTime.annee   = doc["allumage"]["annee"] | 0;
+  cfg.onTime.mois  = doc["allumage"]["mois"] | 0;
+  cfg.onTime.jour = doc["allumage"]["jour"] | 0;
+  
+  //extinction config
+  cfg.ofTime.heure   = doc["extinction"]["heure"] | 0;
+  cfg.ofTime.minute  = doc["extinction"]["minute"] | 0;
+  cfg.ofTime.seconde = doc["extinction"]["seconde"] | 0;
+  cfg.ofTime.annee   = doc["extinction"]["annee"] | 0;
+  cfg.ofTime.mois  = doc["extinction"]["mois"] | 0;
+  cfg.ofTime.jour = doc["extinction"]["jour"] | 0;
 
   return cfg;
 }

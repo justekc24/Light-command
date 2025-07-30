@@ -35,3 +35,24 @@ void updateStateFlexible(const TimeConfig& config, bool& state, const Time& curr
         }
     }
 }
+
+void updateState(const TimeConfig& config, volatile bool& state, const Time& currentTime)
+{
+    // Vérifie la validité des temps
+/*     if (!config.isvalide || !currentTime.valide)
+        return; */
+    
+    // Allumer à la date/heure exacte
+    if (currentTime == config.onTime) {
+          state = true;
+          digitalWrite(13,true);
+        return;
+    }
+
+    // Éteindre à la date/heure exacte
+    if (currentTime == config.ofTime) {
+          state = false;
+          digitalWrite(13,false);
+        return;
+    }
+}

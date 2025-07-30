@@ -53,7 +53,7 @@ void configSetup()
     String json = server.arg("plain");
     server.send(200, "application/json", "{\"status\" : \"succes\",\"Données\" : "+json+"}");
     config = convertToTimeConfig(json);
-    config.isvalide = false;
+    config.isvalide = true;
     saveTimeConfigToEEPROM(config);
     Serial.println("==================");
     Serial.println("On Time");
@@ -133,7 +133,7 @@ void setup()
   }
   else //sinon config par défaut
   {
-    config.onTime = Time{20,0,0,true};
+    config.onTime = Time{19,0,0,true};
     config.ofTime = Time{7,0,0,true};
   }
 
@@ -173,7 +173,7 @@ void loop()
     printTime(t);
     t = getHeureActuelleToRTC(rtc);
     bool lampState = false;
-    updateStateFlexible(config,lampState,t);
+    updateState(config,lampState,t);
     now = millis();
   }
   LampState = digitalRead(LAMP_PIN);
