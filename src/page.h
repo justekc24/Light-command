@@ -23,6 +23,7 @@ const char code[] PROGMEM = R"rawliteral(
             --on-color: #4CAF50;
             --off-color: #F44336;
             --loading-color: #9E9E9E;
+            --warning-color: #FF9800;
         }
 
         * {
@@ -60,6 +61,12 @@ const char code[] PROGMEM = R"rawliteral(
             color: var(--secondary-color);
             border-bottom: 2px solid var(--accent-color);
             padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
         }
 
         main {
@@ -131,6 +138,10 @@ const char code[] PROGMEM = R"rawliteral(
             font-size: 1rem;
         }
 
+        input:invalid {
+            border-color: var(--error-color);
+        }
+
         button {
             color: white;
             border: none;
@@ -196,6 +207,10 @@ const char code[] PROGMEM = R"rawliteral(
             background-color: var(--error-color);
         }
 
+        .toast-warning {
+            background-color: var(--warning-color);
+        }
+
         .state-loading {
             background-color: var(--loading-color);
         }
@@ -216,6 +231,36 @@ const char code[] PROGMEM = R"rawliteral(
             margin-top: auto;
         }
 
+        /* Styles pour la section des configurations */
+        #configurations-affichees {
+            margin-top: 2rem;
+        }
+
+        .config-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .config-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .config-item p {
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .config-time {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -225,35 +270,6 @@ const char code[] PROGMEM = R"rawliteral(
                 grid-template-columns: 1fr;
             }
         }
-        /* Ajoutez ceci dans votre section style */
-#configurations-affichees {
-    margin-top: 2rem;
-}
-
-.config-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 1rem;
-}
-
-.config-item {
-    background-color: white;
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    box-shadow: var(--box-shadow);
-}
-
-.config-item h3 {
-    color: var(--secondary-color);
-    margin-bottom: 0.5rem;
-    font-size: 1.2rem;
-}
-
-.config-item p {
-    font-size: 1.1rem;
-    color: var(--text-color);
-}
     </style>
 </head>
 <body>
@@ -274,7 +290,6 @@ const char code[] PROGMEM = R"rawliteral(
                 </article>
             </section>
         </div>
-
         <section id="reglages">
             <h2>Réglages horaires</h2>
             <form id="config-form">
@@ -283,327 +298,382 @@ const char code[] PROGMEM = R"rawliteral(
                         <legend><strong>Allumage</strong></legend>
                         <label for="on_config">Date/Heure</label>
                         <input type="datetime-local" id="on_config" required>
+                        <p class="hint">Doit être dans le futur</p>
                     </fieldset>
                     <fieldset>
                         <legend><strong>Extinction</strong></legend>
                         <label for="off_config">Date/Heure</label>
                         <input type="datetime-local" id="off_config" required>
+                        <p class="hint">Doit être après l'allumage</p>
                     </fieldset>
                 </div>
                 <button type="submit" id="btn_reglage">Envoyer le réglage</button>
             </form>
         </section>
-                <!-- Ajoutez cette section après la section "reglages" dans votre main -->
-<section id="configurations-affichees">
-    <h2>Configurations enregistrées</h2>
-    <div class="config-container">
-        <div class="config-item">
-            <h3>Allumage</h3>
-            <p id="next-on-config">Aucune configuration</p>
-        </div>
-        <div class="config-item">
-            <h3>Extinction</h3>
-            <p id="next-off-config">Aucune configuration</p>
-        </div>
-    </div>
-</section>
+        
+        <section id="configurations-affichees">
+            <h2>Configurations enregistrées</h2>
+            <div class="config-container">
+                <div class="config-item">
+                    <h3>Prochain allumage</h3>
+                    <p id="next-on-config" class="config-time">Aucune configuration</p>
+                </div>
+                <div class="config-item">
+                    <h3>Prochaine extinction</h3>
+                    <p id="next-off-config" class="config-time">Aucune configuration</p>
+                </div>
+            </div>
+        </section>
     </main>
     <div id="toast"></div>
     <footer>
         <p>&copy; YoupiLight - 2025 - Tous droits réservés</p>
     </footer>
 
-   <script>
-    // ===== CONFIGURATION =====
-    const ESP_IP = "192.168.4.1"; // IP par défaut ESP en mode AP
-    const BASE_URL = `http://${ESP_IP}`;
-    const DEBUG = true;
+    <script>
+        // ===== CONFIGURATION =====
+        const ESP_IP = "192.168.4.1"; // IP par défaut ESP en mode AP
+        const BASE_URL = `http://${ESP_IP}`;
+        const DEBUG = true;
 
-    // ===== ÉLÉMENTS DU DOM =====
-    const etatLampeEl = document.getElementById('etat_lampe');
-    const btnLampeEl = document.getElementById('btn-Lampe');
-    const btnReglageEl = document.getElementById('btn_reglage');
-    const nextOnConfigEl = document.getElementById('next-on-config');
-    const nextOffConfigEl = document.getElementById('next-off-config');
+        // ===== ÉLÉMENTS DU DOM =====
+        const etatLampeEl = document.getElementById('etat_lampe');
+        const btnLampeEl = document.getElementById('btn-Lampe');
+        const btnReglageEl = document.getElementById('btn_reglage');
+        const nextOnConfigEl = document.getElementById('next-on-config');
+        const nextOffConfigEl = document.getElementById('next-off-config');
+        const onConfigInput = document.getElementById('on_config');
+        const offConfigInput = document.getElementById('off_config');
 
-    // ===== ÉTAT APPLICATION =====
-    let lampeState = null; // null = état inconnu, true = allumé, false = éteint
-    let currentConfig = {
-        allumage: null,
-        extinction: null
-    };
-
-    // ===== FONCTIONS UTILITAIRES =====
-    function logDebug(...args) {
-        if (DEBUG) console.log('[DEBUG]', ...args);
-    }
-
-    function showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.className = `toast-${type}`;
-        toast.style.opacity = 1;
-        
-        setTimeout(() => {
-            toast.style.opacity = 0;
-        }, 3000);
-    }
-
-    function padZero(num) {
-        return num < 10 ? `0${num}` : num;
-    }
-
-    function formatDateTime(config) {
-        if (!config) return "Aucune configuration";
-        return `${padZero(config.jour)}/${padZero(config.mois)}/${config.annee} ` +
-               `${padZero(config.heure)}:${padZero(config.minute)}`;
-    }
-
-    // ===== FONCTIONS DE CONFIGURATION =====
-    function parseDataToInt(data) {
-        const parsed = parseInt(data, 10);
-        return isNaN(parsed) ? 0 : parsed;
-    }
-
-    function splitInputAndParseToInt(input) {
-        if (!input || !input.value) {
-            throw new Error('Veuillez remplir tous les champs');
-        }
-        
-        const [date, time] = input.value.split('T');
-        if (!date || !time) {
-            throw new Error('Format datetime invalide. Attendu: YYYY-MM-DDTHH:MM');
-        }
-
-        const [year, month, day] = date.split('-').map(Number);
-        const [hour, minute] = time.split(':').map(Number);
-        const seconde = 0;
-        
-        return {
-            annee: parseDataToInt(year),
-            mois: parseDataToInt(month),
-            jour: parseDataToInt(day),
-            heure: parseDataToInt(hour),
-            minute: parseDataToInt(minute),
-            seconde: parseDataToInt(seconde)
+        // ===== ÉTAT APPLICATION =====
+        let lampeState = null; // null = état inconnu, true = allumé, false = éteint
+        let currentConfig = {
+            allumage: null,
+            extinction: null
         };
-    }
 
-    function displayConfigurations() {
-        nextOnConfigEl.textContent = formatDateTime(currentConfig.allumage);
-        nextOffConfigEl.textContent = formatDateTime(currentConfig.extinction);
-    }
-
-    // ===== GESTION DE L'AFFICHAGE =====
-    function updateUIState() {
-        if (lampeState === null) {
-            btnLampeEl.textContent = "Chargement...";
-            btnLampeEl.className = "";
-            btnLampeEl.disabled = true;
-            etatLampeEl.textContent = "Chargement...";
-            etatLampeEl.className = "state-loading";
-        } else {
-            btnLampeEl.textContent = lampeState ? "Éteindre" : "Allumer";
-            btnLampeEl.className = lampeState ? "on-state" : "off-state";
-            btnLampeEl.disabled = false;
-            etatLampeEl.textContent = lampeState ? "Allumée" : "Éteinte";
-            etatLampeEl.className = lampeState ? "state-on" : "state-off";
+        // ===== FONCTIONS UTILITAIRES =====
+        function logDebug(...args) {
+            if (DEBUG) console.log('[DEBUG]', ...args);
         }
-    }
 
-    // ===== GESTION DE LA LAMPE =====
-    async function toggleLampe() {
-        if (lampeState === null) return;
-        
-        btnLampeEl.disabled = true;
-        const newState = !lampeState;
-        
-        try {
-            const response = await fetch(`${BASE_URL}/lampe`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ state: newState })
-            });
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast-${type}`;
+            toast.style.opacity = 1;
             
-            if (!response.ok) throw new Error('Erreur réseau');
-            
-            const result = await response.json();
-            logDebug('Réponse lampe:', result);
-            
-            lampeState = newState;
-            updateUIState();
-            showToast(`Lampe ${newState ? 'allumée' : 'éteinte'} avec succès`);
-            
-        } catch (err) {
-            logDebug('Erreur lampe:', err);
-            showToast('Erreur de commande', 'error');
-        } finally {
-            btnLampeEl.disabled = false;
+            setTimeout(() => {
+                toast.style.opacity = 0;
+            }, 3000);
         }
-    }
 
-    async function checkLampeState() {
-        try {
-            const response = await fetch(`${BASE_URL}/state`);
-            
-            if (!response.ok) throw new Error('Erreur réseau');
-            
-            const state = await response.json();
-            lampeState = state.etat;
-            logDebug('État lampe:', lampeState);
-            
-        } catch (err) {
-            logDebug('Erreur état lampe:', err);
-            showToast('Erreur de connexion', 'error');
-        } finally {
-            updateUIState();
+        function padZero(num) {
+            return num < 10 ? `0${num}` : num;
         }
-    }
 
-    // ===== GESTION DU TEMPS =====
-    async function updateClock() {
-        try {
-            const response = await fetch(`${BASE_URL}/time`);
-            if (!response.ok) throw new Error('Erreur réseau');
-            
-            const time = await response.json();
-            logDebug('Time response:', time);
-            
-            document.getElementById('heure').textContent = padZero(time.heure);
-            document.getElementById('minute').textContent = padZero(time.minute);
-            document.getElementById('seconde').textContent = padZero(time.seconde);
-            
-        } catch (err) {
-            logDebug('Erreur horloge:', err);
-            // Fallback à l'heure locale
+        function formatDateTime(config) {
+            if (!config) return "Aucune configuration";
+            return `${padZero(config.jour)}/${padZero(config.mois)}/${config.annee} ` +
+                   `${padZero(config.heure)}:${padZero(config.minute)}`;
+        }
+
+        function isFutureDateTime(config) {
             const now = new Date();
-            document.getElementById('heure').textContent = padZero(now.getHours());
-            document.getElementById('minute').textContent = padZero(now.getMinutes());
-            document.getElementById('seconde').textContent = padZero(now.getSeconds());
+            const configDate = new Date(
+                config.annee,
+                config.mois - 1, // Les mois commencent à 0 en JS
+                config.jour,
+                config.heure,
+                config.minute,
+                config.seconde
+            );
+            
+            return configDate > now;
         }
-    }
 
-    // ===== GESTION DES CONFIGURATIONS =====
-    async function loadCurrentConfig() {
-        try {
-            const response = await fetch(`${BASE_URL}/get-config`);
-            
-            if (!response.ok) throw new Error('Erreur réseau');
-            
-            const config = await response.json();
-            currentConfig = config;
-            displayConfigurations();
-            logDebug('Configurations chargées:', config);
-            
-        } catch (err) {
-            logDebug('Erreur chargement config:', err);
-            showToast('Impossible de charger les configurations', 'error');
+        // ===== FONCTIONS DE CONFIGURATION =====
+        function parseDataToInt(data) {
+            const parsed = parseInt(data, 10);
+            return isNaN(parsed) ? 0 : parsed;
         }
-    }
 
-    document.getElementById('config-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        btnReglageEl.disabled = true;
-        
-        try {
-            const configData = {
-                allumage: splitInputAndParseToInt(document.getElementById('on_config')),
-                extinction: splitInputAndParseToInt(document.getElementById('off_config'))
+        function splitInputAndParseToInt(input) {
+            if (!input || !input.value) {
+                throw new Error('Veuillez remplir tous les champs');
+            }
+            
+            const [date, time] = input.value.split('T');
+            if (!date || !time) {
+                throw new Error('Format datetime invalide. Attendu: YYYY-MM-DDTHH:MM');
+            }
+
+            const [year, month, day] = date.split('-').map(Number);
+            const [hour, minute] = time.split(':').map(Number);
+            const seconde = 0;
+            
+            return {
+                annee: parseDataToInt(year),
+                mois: parseDataToInt(month),
+                jour: parseDataToInt(day),
+                heure: parseDataToInt(hour),
+                minute: parseDataToInt(minute),
+                seconde: parseDataToInt(seconde)
             };
-
-            // Validation supplémentaire
-            const onDate = new Date(
-                configData.allumage.annee,
-                configData.allumage.mois - 1,
-                configData.allumage.jour,
-                configData.allumage.heure,
-                configData.allumage.minute
-            );
-            
-            const offDate = new Date(
-                configData.extinction.annee,
-                configData.extinction.mois - 1,
-                configData.extinction.jour,
-                configData.extinction.heure,
-                configData.extinction.minute
-            );
-            
-            if (offDate <= onDate) {
-                throw new Error("L'extinction doit être après l'allumage");
-            }
-
-            logDebug('Envoi configuration:', configData);
-            
-            const response = await fetch(`${BASE_URL}/config`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(configData)
-            });
-            
-            if (!response.ok) {
-                throw new Error('Erreur lors de l\'envoi de la configuration');
-            }
-            
-            const result = await response.json();
-            logDebug('Réponse configuration:', result);
-            
-            // Mettre à jour et afficher la nouvelle configuration
-            currentConfig = configData;
-            displayConfigurations();
-            showToast('Configuration enregistrée avec succès');
-            
-        } catch (err) {
-            logDebug('Erreur configuration:', err);
-            showToast(err.message, 'error');
-        } finally {
-            btnReglageEl.disabled = false;
         }
-    });
 
-    // ===== ÉVÉNEMENTS =====
-    btnLampeEl.addEventListener('click', toggleLampe);
+        function displayConfigurations() {
+            nextOnConfigEl.textContent = formatDateTime(currentConfig.allumage);
+            nextOffConfigEl.textContent = formatDateTime(currentConfig.extinction);
+        }
 
-    // ===== INITIALISATION =====
-    function init() {
-        // Initialiser l'UI avec l'état "chargement"
-        updateUIState();
-        
-        // Démarrer l'horloge
-        updateClock();
-        setInterval(updateClock, 1000);
-        
-        // Vérifier l'état de la lampe
-        checkLampeState();
-        setInterval(checkLampeState, 5000);
-        
-        // Charger les configurations existantes
-        loadCurrentConfig();
-        setInterval(loadCurrentConfig, 30000); // Rafraîchir toutes les 30s
-        
-        // Pré-remplir les champs datetime-local avec l'heure actuelle
-        const now = new Date();
-        const timeString = now.toISOString().slice(0, 16);
-        document.getElementById('on_config').value = timeString;
-        
-        // Ajouter 1 heure pour l'extinction par défaut
-        now.setHours(now.getHours() + 1);
-        document.getElementById('off_config').value = now.toISOString().slice(0, 16);
-        
-        logDebug('Application initialisée');
-    }
+        // ===== GESTION DE L'AFFICHAGE =====
+        function updateUIState() {
+            if (lampeState === null) {
+                btnLampeEl.textContent = "Chargement...";
+                btnLampeEl.className = "";
+                btnLampeEl.disabled = true;
+                etatLampeEl.textContent = "Chargement...";
+                etatLampeEl.className = "state-loading";
+            } else {
+                btnLampeEl.textContent = lampeState ? "Éteindre" : "Allumer";
+                btnLampeEl.className = lampeState ? "on-state" : "off-state";
+                btnLampeEl.disabled = false;
+                etatLampeEl.textContent = lampeState ? "Allumée" : "Éteinte";
+                etatLampeEl.className = lampeState ? "state-on" : "state-off";
+            }
+        }
 
-    // Démarrer quand le DOM est prêt
-    if (document.readyState !== 'loading') {
-        init();
-    } else {
-        document.addEventListener('DOMContentLoaded', init);
-    }
-</script>
+        // ===== GESTION DE LA LAMPE =====
+        async function toggleLampe() {
+            if (lampeState === null) return;
+            
+            btnLampeEl.disabled = true;
+            const newState = !lampeState;
+            
+            try {
+                const response = await fetch(`${BASE_URL}/lampe`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ state: newState })
+                });
+                
+                if (!response.ok) throw new Error('Erreur réseau');
+                
+                const result = await response.json();
+                logDebug('Réponse lampe:', result);
+                
+                lampeState = newState;
+                updateUIState();
+                showToast(`Lampe ${newState ? 'allumée' : 'éteinte'} avec succès`);
+                
+            } catch (err) {
+                logDebug('Erreur lampe:', err);
+                showToast('Erreur de commande', 'error');
+            } finally {
+                btnLampeEl.disabled = false;
+            }
+        }
+
+        async function checkLampeState() {
+            try {
+                const response = await fetch(`${BASE_URL}/state`);
+                
+                if (!response.ok) throw new Error('Erreur réseau');
+                
+                const state = await response.json();
+                lampeState = state.etat;
+                logDebug('État lampe:', lampeState);
+                
+            } catch (err) {
+                logDebug('Erreur état lampe:', err);
+                showToast('Erreur de connexion', 'error');
+            } finally {
+                updateUIState();
+            }
+        }
+
+        // ===== GESTION DU TEMPS =====
+        async function updateClock() {
+            try {
+                const response = await fetch(`${BASE_URL}/time`);
+                if (!response.ok) throw new Error('Erreur réseau');
+                
+                const time = await response.json();
+                logDebug('Time response:', time);
+                
+                document.getElementById('heure').textContent = padZero(time.heure);
+                document.getElementById('minute').textContent = padZero(time.minute);
+                document.getElementById('seconde').textContent = padZero(time.seconde);
+                
+            } catch (err) {
+                logDebug('Erreur horloge:', err);
+                // Fallback à l'heure locale
+                const now = new Date();
+                document.getElementById('heure').textContent = padZero(now.getHours());
+                document.getElementById('minute').textContent = padZero(now.getMinutes());
+                document.getElementById('seconde').textContent = padZero(now.getSeconds());
+            }
+        }
+
+        // ===== GESTION DES CONFIGURATIONS =====
+        async function loadCurrentConfig() {
+            try {
+                const response = await fetch(`${BASE_URL}/get-config`);
+                
+                if (!response.ok) throw new Error('Erreur réseau');
+                
+                const config = await response.json();
+                currentConfig = config;
+                displayConfigurations();
+                logDebug('Configurations chargées:', config);
+                
+            } catch (err) {
+                logDebug('Erreur chargement config:', err);
+                showToast('Impossible de charger les configurations', 'error');
+            }
+        }
+
+        // Validation en temps réel des inputs
+        onConfigInput.addEventListener('change', function() {
+            try {
+                const config = splitInputAndParseToInt(this);
+                if (!isFutureDateTime(config)) {
+                    this.setCustomValidity("Doit être dans le futur");
+                    showToast("L'heure d'allumage doit être dans le futur", 'warning');
+                } else {
+                    this.setCustomValidity("");
+                }
+            } catch (e) {
+                this.setCustomValidity("");
+            }
+        });
+
+        offConfigInput.addEventListener('change', function() {
+            try {
+                const config = splitInputAndParseToInt(this);
+                if (!isFutureDateTime(config)) {
+                    this.setCustomValidity("Doit être dans le futur");
+                    showToast("L'heure d'extinction doit être dans le futur", 'warning');
+                } else {
+                    this.setCustomValidity("");
+                }
+            } catch (e) {
+                this.setCustomValidity("");
+            }
+        });
+
+        document.getElementById('config-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            btnReglageEl.disabled = true;
+            
+            try {
+                const configData = {
+                    allumage: splitInputAndParseToInt(onConfigInput),
+                    extinction: splitInputAndParseToInt(offConfigInput)
+                };
+
+                // Validation 1: Vérifier que c'est dans le futur
+                if (!isFutureDateTime(configData.allumage)) {
+                    throw new Error("L'heure d'allumage doit être dans le futur");
+                }
+                
+                if (!isFutureDateTime(configData.extinction)) {
+                    throw new Error("L'heure d'extinction doit être dans le futur");
+                }
+
+                // Validation 2: Vérifier que l'extinction est après l'allumage
+                const onDate = new Date(
+                    configData.allumage.annee,
+                    configData.allumage.mois - 1,
+                    configData.allumage.jour,
+                    configData.allumage.heure,
+                    configData.allumage.minute
+                );
+                
+                const offDate = new Date(
+                    configData.extinction.annee,
+                    configData.extinction.mois - 1,
+                    configData.extinction.jour,
+                    configData.extinction.heure,
+                    configData.extinction.minute
+                );
+                
+                if (offDate <= onDate) {
+                    throw new Error("L'extinction doit être après l'allumage");
+                }
+
+                logDebug('Envoi configuration:', configData);
+                
+                const response = await fetch(`${BASE_URL}/config`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(configData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur lors de l\'envoi de la configuration');
+                }
+                
+                const result = await response.json();
+                logDebug('Réponse configuration:', result);
+                
+                currentConfig = configData;
+                displayConfigurations();
+                showToast('Configuration enregistrée avec succès');
+                
+            } catch (err) {
+                logDebug('Erreur configuration:', err);
+                showToast(err.message, 'error');
+            } finally {
+                btnReglageEl.disabled = false;
+            }
+        });
+
+        // ===== ÉVÉNEMENTS =====
+        btnLampeEl.addEventListener('click', toggleLampe);
+
+        // ===== INITIALISATION =====
+        function init() {
+            // Initialiser l'UI avec l'état "chargement"
+            updateUIState();
+            
+            // Démarrer l'horloge
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            // Vérifier l'état de la lampe
+            checkLampeState();
+            setInterval(checkLampeState, 5000);
+            
+            // Charger les configurations existantes
+            loadCurrentConfig();
+            setInterval(loadCurrentConfig, 30000); // Rafraîchir toutes les 30s
+            
+            // Pré-remplir les champs datetime-local avec l'heure actuelle
+            const now = new Date();
+            const timeString = now.toISOString().slice(0, 16);
+            onConfigInput.value = timeString;
+            
+            // Ajouter 1 heure pour l'extinction par défaut
+            now.setHours(now.getHours() + 1);
+            offConfigInput.value = now.toISOString().slice(0, 16);
+            
+            logDebug('Application initialisée');
+        }
+
+        // Démarrer quand le DOM est prêt
+        if (document.readyState !== 'loading') {
+            init();
+        } else {
+            document.addEventListener('DOMContentLoaded', init);
+        }
+    </script>
 </body>
 </html>
 )rawliteral";
