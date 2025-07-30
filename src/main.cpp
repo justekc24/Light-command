@@ -23,6 +23,7 @@ Time t = {10,20,30,true};
 ESP8266WebServer server;
 TimeConfig config ;
 volatile bool LampState = false;
+volatile bool manuelCommandState = false;
 
 void printTime(const Time &t)
 {
@@ -77,7 +78,8 @@ void command()
     {
       Serial.println("Erreur de désérialisation");
     }
-    digitalWrite(LAMP_PIN,doc["state"] ? true : false);
+    manuelCommandState = !manuelCommandState;
+    digitalWrite(LAMP_PIN,manuelCommandState);
   }
   else
   {
@@ -88,6 +90,12 @@ void command()
 void getLampeState()
 {
   server.send(200,"text/json","{\"etat\": "+String(LampState)+"}");
+}
+
+void gestionInterruption()
+{
+  manuelCommandState = !manuelCommandState;
+  digitalWrite(LAMP_PIN,manuelCommandState);
 }
 
 void setup()
@@ -145,6 +153,9 @@ void setup()
   server.on("/lampe",HTTP_POST,command);
   server.on("/state",HTTP_GET,getLampeState);
   server.begin();
+
+  //attach interrupt
+  attachInterrupt(digitalPinToInterrupt(SWITCH_PIN), gestionInterruption, CHANGE);
 }
 
 void loop()
@@ -156,9 +167,8 @@ void loop()
     t = getHeureActuelleToRTC(rtc);
     bool lampState = false;
     updateStateFlexible(config,lampState,t);
-    digitalWrite(LAMP_PIN,lampState);
+    //digitalWrite(LAMP_PIN,lampState);
     now = millis();
   }
-  digitalWrite(LAMP_PIN,!digitalRead(SWITCH_PIN));
   LampState = digitalRead(LAMP_PIN);
 }
