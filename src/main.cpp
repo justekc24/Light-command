@@ -54,6 +54,7 @@ void configSetup()
     printTime(config.onTime);
     Serial.println("Off Time");
     printTime(config.ofTime);
+    Serial.println(json);
   }
   else
   {
@@ -92,7 +93,7 @@ void getLampeState()
   server.send(200,"text/json","{\"etat\": "+String(LampState)+"}");
 }
 
-void gestionInterruption()
+void IRAM_ATTR gestionInterruption()
 {
   manuelCommandState = !manuelCommandState;
   digitalWrite(LAMP_PIN,manuelCommandState);
@@ -163,7 +164,7 @@ void loop()
   server.handleClient();
   if(millis() - now > INTERVALLE)
   {
-    printTime(t);
+    //printTime(t);
     t = getHeureActuelleToRTC(rtc);
     bool lampState = false;
     updateStateFlexible(config,lampState,t);

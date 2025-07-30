@@ -2,8 +2,17 @@
 #include <string>
 #include <ArduinoJson.h>
 
+/*
+{
+  "allumage": {"annee":2025,"mois":7,"jour":30,"heure":10,"minute":59,"seconde":0},
+  "extinction": {"annee":2025,"mois":7,"jour":30,"heure":11,"minute":0,"seconde":0}
+}
+*/
 struct Time
 {
+    long annee;
+    long mois;
+    long jour;
     long heure;
     long minute;
     long seconde;    

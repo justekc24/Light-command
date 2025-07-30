@@ -499,7 +499,7 @@ const char code[] PROGMEM = R"rawliteral(
             
             // Vérifier l'état de la lampe
             checkLampeState();
-            setInterval(checkLampeState, 5000);
+            setInterval(checkLampeState, 1000);
             
             // Pré-remplir les champs datetime-local avec l'heure actuelle
             const now = new Date();
