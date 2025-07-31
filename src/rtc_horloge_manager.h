@@ -9,6 +9,7 @@ void setupTimeToRTC(const Time &reelTime,RTC_DS3231 &rtc)
   int heure = reelTime.heure;
   int minute = reelTime.minute;
   int seconde = reelTime.seconde;
+  rtc.adjust(DateTime(2025, 7, 27, heure, minute, seconde));
   // Date fixe (exemple : 2025-07-27)
 }
 
