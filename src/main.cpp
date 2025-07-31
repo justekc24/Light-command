@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
+#include <ESPAsyncWebServer.h>
 #include <Wire.h>
 #include <RTClib.h>
 #include "def.h"
@@ -11,8 +11,13 @@
 #include "timeManager.h"
 
 #define INTERVALLE 1000
-#define LAMP_PIN 13
-#define SWITCH_PIN 2
+#define LAMP_PIN 13 //d7
+#define SWITCH_PIN 2 //D4
+#define LAMP_PIN_2 15//d8
+#define SWITCH_PIN_2 0 //D4
+
+//SCL D1
+//sda d2
 
 const char *ssid = "esp8266 wifi";
 const char *password = "isniis";
@@ -20,7 +25,7 @@ const char *password = "isniis";
 RTC_DS3231 rtc;
 unsigned long now = 0;
 Time t = {10,20,30,true};
-ESP8266WebServer server;
+AsyncWebServer server(80);
 TimeConfig config ;
 volatile bool LampState = false;
 volatile bool manuelCommandState = false;
@@ -36,17 +41,17 @@ void printTime(const Time &t)
     Serial.println(" s");
 }
 
-void handleRoot()
+void handleRoot(AsyncWebServerRequest *request)
 {
-  server.send_P(200, "text/html", code);
+  request->send_P(200, "text/html", code);
 }
 
-void configSetup()
+void configSetup(AsyncWebServerRequest *request)
 {
-  if (server.hasArg("plain"))
+  if (request->hasArg("plain"))
   {
-    String json = server.arg("plain");
-    server.send(200, "application/json", "{\"status\" : \"succes\",\"Données\" : "+json+"}");
+    String json = request->arg("plain");
+    request->send(200, "application/json", "{\"status\" : \"succes\",\"Données\" : "+json+"}");
     config = convertToTimeConfig(json);
     config.isvalide = true;
     saveTimeConfigToEEPROM(config);
@@ -59,21 +64,21 @@ void configSetup()
   }
   else
   {
-    server.send(404, "application/json", "{\"status\" : \"echec\"}");
+    request->send(404, "application/json", "{\"status\" : \"echec\"}");
   }
 }
 
-void timeGet()
+void timeGet(AsyncWebServerRequest *request)
 {
-  server.send(200, "application/json", "{\"heure\":" + String(t.heure) + ",\"minute\":" + String(t.minute) + ",\"seconde\":" + String(t.seconde) + "}");
+  request->send(200, "application/json", "{\"heure\":" + String(t.heure) + ",\"minute\":" + String(t.minute) + ",\"seconde\":" + String(t.seconde) + "}");
 }
 
-void command()
+void command(AsyncWebServerRequest *request)
 {
-  if(server.hasArg("plain"))
+  if(request->hasArg("plain"))
   {
-    String json = server.arg("plain");
-    server.send(200,"text/json","{\"status\" : \"succes\"}");
+    String json = request->arg("plain");
+    request->send(200,"text/json","{\"status\" : \"succes\"}");
     JsonDocument doc;
     DeserializationError error = deserializeJson(doc,json);
     if(error)
@@ -85,13 +90,13 @@ void command()
   }
   else
   {
-    server.send(404,"text/json", "{\"status\" : \"echec\"}");
+    request->send(404,"text/json", "{\"status\" : \"echec\"}");
   }
 }
 
-void getLampeState()
+void getLampeState(AsyncWebServerRequest *request)
 {
-  server.send(200,"text/json","{\"etat\": "+String(LampState)+"}");
+  request->send(200,"text/json","{\"etat\": "+String(LampState)+"}");
 }
 
 void IRAM_ATTR gestionInterruption()
@@ -100,9 +105,9 @@ void IRAM_ATTR gestionInterruption()
   digitalWrite(LAMP_PIN,manuelCommandState);
 }
 
-void getConfig()
+void getConfig(AsyncWebServerRequest *request)
 {
-  server.send(200,"text/json",String("{")+
+  request->send(200,"text/json",String("{")+
   "\"allumage\":");
 }
 
@@ -169,7 +174,6 @@ void setup()
 
 void loop()
 {
-  server.handleClient();
   if(millis() - now > INTERVALLE)
   {
     printTime(t);

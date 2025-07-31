@@ -3,7 +3,6 @@
 //ici le SIM800L
 #define TINY_GSM_MODEM_SIM800
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
 #include <SoftwareSerial.h>
 #include <TinyGsmClient.h>
 #include <ArduinoHttpClient.h>
@@ -88,7 +87,7 @@ namespace gsm
               para += data[i];
         }
 
-        now = Time{date.substring(0,4).toInt(),date.substring(5,7).toInt(),date.substring(8,10).toInt(),dataLists[0].toInt(),dataLists[1].toInt(),dataLists[2].toInt(),true};
+        now = Time{dataLists[0].toInt(),dataLists[1].toInt(),dataLists[2].toInt(),true};
         Serial.println(date.substring(8,9));
         return now;
     }
