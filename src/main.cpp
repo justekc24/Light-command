@@ -27,11 +27,6 @@ volatile bool manuelCommandState = false;
 
 void printTime(const Time &t)
 {
-    Serial.print(t.jour);
-    Serial.print("-");
-    Serial.print(t.mois);
-    Serial.print("-");
-    Serial.print(t.annee);
     Serial.print(" ");
     Serial.print(t.heure);
     Serial.print(" h ");
@@ -108,10 +103,7 @@ void IRAM_ATTR gestionInterruption()
 void getConfig()
 {
   server.send(200,"text/json",String("{")+
-  "\"allumage\":"+
-  "{\"annee\":"+String(config.onTime.annee)+",\"mois\":"+String(config.onTime.mois)+",\"jour\":"+String(config.onTime.jour)+",\"heure\":"+String(config.onTime.heure)+",\"minute\":"+String(config.onTime.minute)+",\"seconde\":"+String(config.onTime.seconde)+"},"+
-  +"\"extinction\": {\"annee\":"+String(config.ofTime.annee)+",\"mois\":"+String(config.ofTime.mois)+",\"jour\":"+String(config.ofTime.jour)+",\"heure\":"+String(config.ofTime.heure)+",\"minute\":"+String(config.ofTime.minute)+",\"seconde\":"+String(config.ofTime.seconde)+"}"+
-  +"}");
+  "\"allumage\":");
 }
 
 void setup()
@@ -167,7 +159,7 @@ void setup()
   server.on("/config", HTTP_POST, configSetup);
   server.on("/time", HTTP_GET, timeGet);
   server.on("/lampe",HTTP_POST,command);
-  server.on("/state",HTTP_GET,getLampeState);
+  server.on("/getState",HTTP_GET,getLampeState);
   server.on("/get-config",HTTP_GET,getConfig);
   server.begin();
 
