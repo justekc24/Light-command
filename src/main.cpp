@@ -12,6 +12,7 @@
 
 #define INTERVALLE 1000
 #define LAMP_PIN 13
+#define LAMP_PIN2 12 // Le pin de la seconde lampe
 #define SWITCH_PIN 2
 
 const char *ssid = "esp8266 wifi";
@@ -20,6 +21,12 @@ const char *password = "isniis";
 RTC_DS3231 rtc;
 unsigned long now = 0;
 Time t = {10,20,30,true};
+
+Time t2  = {10,20,30,true};
+TimeConfig config2 ;
+volatile bool LampState2 = false;
+volatile bool manuelCommandState2 = false;
+
 ESP8266WebServer server;
 TimeConfig config ;
 volatile bool LampState = false;
@@ -126,7 +133,11 @@ void setup()
   //init de la lampe
   pinMode(LAMP_PIN,OUTPUT);
   digitalWrite(LAMP_PIN,0);
-  
+
+//Initialisation de la 2ème lampe
+  pinMode(LAMP_PIN2,OUTPUT);
+  digitalWrite(LAMP_PIN2,0);
+    
   //init du port série
   Serial.begin(115200);
   Serial.println("\n\nStarting setup...");
@@ -139,21 +150,35 @@ void setup()
   if(loadTimeConfigToEEPROM().isvalide)
   {
     config = loadTimeConfigToEEPROM();
+
+    config2 = loadTimeConfigToEEPROM();
+    
   }
   else //sinon config par défaut
   {
     config.onTime = Time{19,0,0,true};
     config.ofTime = Time{7,0,0,true};
+
+    config2.onTime = Time{19,0,0,true};
+    config2.ofTime = Time{7,0,0,true};
+      
   }
 
   // Récupération du temps réel actuel en ligne grâce au gsm
   t = gsm::getNowTime();
   t.valide = true;
 
+  t2 = gsm::getNowTime();
+  t2.valide = true;
+
+
   //Réglage manuelle de l'heure du module rtc grâce à l'heure que le module gsm à récupéré en ligne
   setupTimeToRTC(t,rtc);
   printTime(t);
 
+  setupTimeToRTC(t2,rtc);
+  printTime(t2);
+    
   // Réactiver le WiFi
   Serial.println("Starting WiFi AP...");
   WiFi.mode(WIFI_AP);
@@ -181,10 +206,23 @@ void loop()
   if(millis() - now > INTERVALLE)
   {
     printTime(t);
+
+    printTime(t2);
+      
     t = getHeureActuelleToRTC(rtc);
+
+      t2 = getHeureActuelleToRTC(rtc);
+
+      
     bool lampState = false;
+
+    bool lampState2 = false;
+    updateState(config2,lampState2,t2);
+      
     updateState(config,lampState,t);
     now = millis();
   }
   LampState = digitalRead(LAMP_PIN);
+
+   LampState2 = digitalRead(LAMP_PIN2);
 }
